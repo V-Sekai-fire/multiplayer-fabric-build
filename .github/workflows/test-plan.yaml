@@ -1,0 +1,101 @@
+name: Test Plan — per-feature-branch isolation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, edited, synchronize]
+
+# Implements ADR decisions/20260426-isolated-godot-submodule-checkouts.md
+#
+# Each feat/* branch of multiplayer-fabric-godot is cloned on-demand
+# (shallow, no subrepo commit) and built independently.
+# A failure here points directly at the owning branch without
+# requiring bisection of the combined multiplayer-fabric build.
+
+jobs:
+  test-plan:
+    runs-on: ubuntu-22.04
+    permissions:
+      pull-requests: write
+      actions: write
+    container:
+      image: fedora:39
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - godot_dir: godot-engine
+            branch: feat/engine-patches
+            platform: windows
+          - godot_dir: godot-engine
+            branch: feat/engine-patches
+            platform: linuxbsd
+          - godot_dir: godot-http3
+            branch: feat/module-http3
+            platform: windows
+          - godot_dir: godot-http3
+            branch: feat/module-http3
+            platform: linuxbsd
+          - godot_dir: godot-otel
+            branch: feat/open-telemetry
+            platform: windows
+          - godot_dir: godot-otel
+            branch: feat/open-telemetry
+            platform: linuxbsd
+          - godot_dir: godot-fabric
+            branch: feat/module-multiplayer-fabric
+            platform: windows
+          - godot_dir: godot-fabric
+            branch: feat/module-multiplayer-fabric
+            platform: linuxbsd
+          - godot_dir: godot
+            branch: multiplayer-fabric
+            platform: windows
+          - godot_dir: godot
+            branch: multiplayer-fabric
+            platform: linuxbsd
+
+    steps:
+      - uses: extractions/setup-just@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "1.22.3"
+
+      - name: Checkout build repo (Justfile + scripts only)
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            Justfile
+          sparse-checkout-cone-mode: false
+
+      - name: Install git
+        run: dnf install -y git
+
+      - name: Clone feat branch (shallow)
+        run: |
+          git clone --depth 1 --branch ${{ matrix.branch }} \
+            https://github.com/V-Sekai-fire/multiplayer-fabric-godot.git \
+            ${{ matrix.godot_dir }}
+
+      - name: Install packages
+        run: just install_packages
+
+      - name: Fetch platform deps
+        run: |
+          case "${{ matrix.platform }}" in
+            windows)
+              just fetch-llvm-mingw
+              GODOT_DIR=${{ matrix.godot_dir }} just setup-d3d12
+              ;;
+          esac
+
+      - name: Build ${{ matrix.branch }} / ${{ matrix.platform }}
+        run: |
+          GODOT_DIR=${{ matrix.godot_dir }} \
+            just build-platform-target ${{ matrix.platform }} template_release x86_64 double
