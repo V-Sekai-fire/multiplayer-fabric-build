@@ -3,9 +3,6 @@ name: Build Platform Target
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
-    types: [opened, reopened, edited, synchronize]
 
 jobs:
   build-native:
@@ -112,17 +109,16 @@ jobs:
         precision: [double]
         architecture: [x86_64, arm64, wasm32]
         platform: [linuxbsd, windows, android, web]
-        target: [editor, template_release, template_debug]
+        target: [editor, template_release]
         exclude:
-            # Android templates step is combined
-            - platform: android
-              target: template_debug
             - platform: android
               architecture: x86_64
             - platform: android
               architecture: wasm32
             - platform: linuxbsd
               architecture: wasm32
+            - platform: linuxbsd
+              architecture: arm64
             - platform: windows
               architecture: wasm32
             - platform: windows
@@ -131,6 +127,8 @@ jobs:
               architecture: arm64
             - platform: web
               architecture: x86_64
+            - platform: web
+              target: editor
 
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.platform }}-${{ matrix.target }}-${{ matrix.precision }}-${{ matrix.architecture }}
