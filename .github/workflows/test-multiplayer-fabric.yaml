@@ -46,7 +46,7 @@ jobs:
         run: |
           git clone --depth 1 --branch multiplayer-fabric \
             https://github.com/V-Sekai-fire/multiplayer-fabric-godot.git \
-            godot
+            godot-combined
 
       - name: Install packages
         run: just install_packages
@@ -56,11 +56,11 @@ jobs:
           case "${{ matrix.platform }}" in
             windows)
               just fetch-llvm-mingw
-              GODOT_DIR=godot just setup-d3d12
+              GODOT_DIR=godot-combined just setup-d3d12
               ;;
           esac
 
       - name: Build multiplayer-fabric / ${{ matrix.platform }}
         run: |
-          GODOT_DIR=godot \
+          GODOT_DIR=godot-combined \
             just build-platform-target ${{ matrix.platform }} template_release x86_64 double
