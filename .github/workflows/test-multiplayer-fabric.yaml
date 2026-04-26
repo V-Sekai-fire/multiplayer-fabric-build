@@ -1,0 +1,66 @@
+name: Test Plan — multiplayer-fabric (combined)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, edited, synchronize]
+
+jobs:
+  test-plan:
+    runs-on: ubuntu-22.04
+    permissions:
+      pull-requests: write
+      actions: write
+    container:
+      image: fedora:39
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows
+          - platform: linuxbsd
+
+    steps:
+      - uses: extractions/setup-just@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "1.22.3"
+
+      - name: Checkout build repo (Justfile only)
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            Justfile
+          sparse-checkout-cone-mode: false
+
+      - name: Install git
+        run: dnf install -y git
+
+      - name: Clone multiplayer-fabric (shallow)
+        run: |
+          git clone --depth 1 --branch multiplayer-fabric \
+            https://github.com/V-Sekai-fire/multiplayer-fabric-godot.git \
+            godot
+
+      - name: Install packages
+        run: just install_packages
+
+      - name: Fetch platform deps
+        run: |
+          case "${{ matrix.platform }}" in
+            windows)
+              just fetch-llvm-mingw
+              GODOT_DIR=godot just setup-d3d12
+              ;;
+          esac
+
+      - name: Build multiplayer-fabric / ${{ matrix.platform }}
+        run: |
+          GODOT_DIR=godot \
+            just build-platform-target ${{ matrix.platform }} template_release x86_64 double
