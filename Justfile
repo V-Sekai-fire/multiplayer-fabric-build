@@ -14,6 +14,7 @@ export GODOT_STATUS := "groups-4.3"
 export GIT_URL_DOCKER := "https://github.com/V-Sekai-fire/docker-multiplayer-fabric.git"
 export GIT_URL_VSEKAI := "https://github.com/V-Sekai-fire/multiplayer-fabric-abyssal.git"
 export WORLD_PWD := invocation_directory()
+export GODOT_DIR := env_var_or_default("GODOT_DIR", "godot")
 export ANDROID_NDK_VERSION := "23.2.8568313"
 export arm64toolchain := "https://github.com/godotengine/buildroot/releases/download/godot-2023.08.x-4/aarch64-godot-linux-gnu_sdk-buildroot.tar.bz2"
 export cmdlinetools := "commandlinetools-linux-11076708_latest.zip"
@@ -63,7 +64,7 @@ fetch-llvm-mingw:
 
 setup-d3d12:
     #!/usr/bin/env bash
-    cd $WORLD_PWD/godot
+    cd $WORLD_PWD/$GODOT_DIR
     if [ ! -d "bin/build_deps/mesa" ] || [ ! -d "bin/build_deps/agility_sdk" ]; then
         python3 misc/scripts/install_d3d12_sdk_windows.py --mingw_prefix=${MINGW_PREFIX}
     fi
@@ -179,7 +180,7 @@ build-platform-target platform target arch="auto" precision="double" osx_bundle=
         rename 'aarch64-godot-linux-gnu-' '' ${ARM64_ROOT}/bin/*;
         export PATH="$ARM64_ROOT/bin:$PATH";
     fi
-    cd godot
+    cd $GODOT_DIR
     case "{{platform}}" in
         macos)
             if [ "$(uname)" = "Darwin" ]; then
@@ -288,14 +289,14 @@ build-platform-target platform target arch="auto" precision="double" osx_bundle=
     just handle-special-cases {{platform}} {{target}}
 
     # Remove intermediate build files before copy
-    rm -rf $WORLD_PWD/godot/bin/obj
+    rm -rf $WORLD_PWD/$GODOT_DIR/bin/obj
 
     # In Github runner copy editor as hardlink to save space
     if [[ "$(just is-github-actions)" == "true" ]]; then COPYSYM="-l"; else COPYSYM=""; fi
 
     if [[ "{{target}}" == "editor" ]]; then
         mkdir -p $WORLD_PWD/editors
-        cp $COPYSYM -rf $WORLD_PWD/godot/bin/* $WORLD_PWD/editors
+        cp $COPYSYM -rf $WORLD_PWD/$GODOT_DIR/bin/* $WORLD_PWD/editors
     elif [[ "{{target}}" =~ template_* && \
             "{{platform}}" =~ ^(mac|i)os && \
             "{{osx_bundle}}" == "no" ]]; then
@@ -303,7 +304,7 @@ build-platform-target platform target arch="auto" precision="double" osx_bundle=
         true
     elif [[ "{{target}}" =~ template_* ]]; then
         mkdir -p $WORLD_PWD/tpz
-        cp -rf $WORLD_PWD/godot/bin/* $WORLD_PWD/tpz
+        cp -rf $WORLD_PWD/$GODOT_DIR/bin/* $WORLD_PWD/tpz
     fi
 
 build-platform-templates platform arch="auto" precision="double":
@@ -330,7 +331,7 @@ handle-special-cases platform target:
 
 handle-android target:
     #!/usr/bin/env bash
-    cd godot
+    cd $GODOT_DIR
     if [ "{{target}}" = "editor" ]; then
         cd platform/android/java
         ./gradlew generateGodotEditor
@@ -346,7 +347,7 @@ handle-android target:
 
 handle-macos target:
     #!/usr/bin/env bash
-    cd godot
+    cd $GODOT_DIR
     if [ "{{target}}" = "editor" ]; then
         chmod +x ./bin/*.app/Contents/MacOS/* || echo "Could not set execute permission on editor"
     fi
