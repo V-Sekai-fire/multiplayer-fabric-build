@@ -6,6 +6,6 @@
 [subrepo]
 	remote = https://github.com/V-Sekai-fire/multiplayer-fabric-godot.git
 	branch = multiplayer-fabric
-	commit = a0b99c14d07b4cb976ea8a5756968f7d976ea4af
-	parent = 688aaf8e4096c9b854643f387ed42846103a6c3d
+	commit = 442a86ed4e9842bd2ecc5f37a33c0fb34e3827cb
+	parent = 4d7ef7b4422a5bc07a4a5b66ccb05cbe43f7af31
 	cmdver = 0.1.0
