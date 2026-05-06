@@ -283,7 +283,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [linuxbsd, windows, macos, android, web]
+        platform: [linuxbsd, windows, macos, android]
     steps:
       - name: Merge Artifacts
         uses: actions/upload-artifact/merge@v4
@@ -371,7 +371,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [linuxbsd, windows, macos, android, web]
+        platform: [linuxbsd, windows, macos, android]
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v4
