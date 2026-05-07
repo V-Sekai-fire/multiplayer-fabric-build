@@ -24,7 +24,7 @@ jobs:
           - feat/engine-patches
           - feat/module-http3
           - feat/module-multiplayer-fabric
-          - multiplayer-fabric
+          - multiplayer-fabric-base
         platform:
           - linuxbsd
           - windows
