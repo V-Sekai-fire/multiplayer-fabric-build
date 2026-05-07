@@ -37,7 +37,7 @@
 
 #include <stdint.h>
 #define ssize_t int
-#include <winsock2.h>
+#include <Winsock2.h>
 
 #ifndef gettimeofday
 #define gettimeofday wintimeofday

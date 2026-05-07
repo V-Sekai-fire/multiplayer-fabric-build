@@ -1,4 +1,4 @@
-name: Test Plan — feat/module-multiplayer-fabric
+name: Test Plan — feature branches
 
 on:
   push:
@@ -20,9 +20,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - platform: windows
-          - platform: linuxbsd
+        branch:
+          - feat/engine-patches
+          - feat/module-http3
+          - feat/module-multiplayer-fabric
+          - multiplayer-fabric
+        platform:
+          - linuxbsd
+          - windows
+
+    name: ${{ matrix.branch }} / ${{ matrix.platform }}
 
     steps:
       - uses: extractions/setup-just@v3
@@ -42,11 +49,11 @@ jobs:
       - name: Install git
         run: dnf install -y git
 
-      - name: Clone feat/module-multiplayer-fabric (shallow)
+      - name: Clone ${{ matrix.branch }} (shallow)
         run: |
-          git clone --depth 1 --branch feat/module-multiplayer-fabric \
+          git clone --depth 1 --branch ${{ matrix.branch }} \
             https://github.com/V-Sekai-fire/multiplayer-fabric-godot.git \
-            godot-fabric
+            godot-engine
 
       - name: Install packages
         run: just install_packages
@@ -56,11 +63,11 @@ jobs:
           case "${{ matrix.platform }}" in
             windows)
               just fetch-llvm-mingw
-              GODOT_DIR=godot-fabric just setup-d3d12
+              GODOT_DIR=godot-engine just setup-d3d12
               ;;
           esac
 
-      - name: Build feat/module-multiplayer-fabric / ${{ matrix.platform }}
+      - name: Build ${{ matrix.branch }} / ${{ matrix.platform }}
         run: |
-          GODOT_DIR=godot-fabric \
+          GODOT_DIR=godot-engine \
             just build-platform-target ${{ matrix.platform }} template_release x86_64 double
