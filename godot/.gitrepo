@@ -6,6 +6,6 @@
 [subrepo]
 	remote = https://github.com/V-Sekai-fire/multiplayer-fabric-godot-maglev.git
 	branch = multiplayer-fabric-base
-	commit = 807a6353998f5f2d3e0f423ed3b565d3953fa481
-	parent = 853b908fd4382780196601597147a24e899f85e3
+	commit = 4304d18b6c65766f2c56a8d6193535636879c6d9
+	parent = d31142d25c5da8cbb0da631f1672d3d99e0c11b4
 	cmdver = 0.1.0
