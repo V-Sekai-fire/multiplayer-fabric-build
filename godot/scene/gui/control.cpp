@@ -2425,6 +2425,7 @@ void Control::gui_input(const Ref<InputEvent> &p_event) {
 }
 
 void Control::call_gui_input(const Ref<InputEvent> &p_event) {
+	ERR_FAIL_COND(p_event.is_null());
 	ERR_FAIL_COND(!is_inside_tree());
 	// Isolate this direct call from the viewport's global is_input_handled() state.
 	// Without isolation, a prior accepted event would skip the virtual method here,
@@ -4740,6 +4741,7 @@ void Control::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_focus_previous", "previous"), &Control::set_focus_previous);
 	ClassDB::bind_method(D_METHOD("get_focus_previous"), &Control::get_focus_previous);
 
+	ClassDB::bind_method(D_METHOD("call_gui_input", "event"), &Control::call_gui_input);
 	ClassDB::bind_method(D_METHOD("force_drag", "data", "preview"), &Control::force_drag);
 
 	ClassDB::bind_method(D_METHOD("accessibility_drag"), &Control::accessibility_drag);

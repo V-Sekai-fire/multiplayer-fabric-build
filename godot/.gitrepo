@@ -4,8 +4,8 @@
 ; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
 ;
 [subrepo]
-	remote = https://github.com/V-Sekai-fire/multiplayer-fabric-godot.git
-	branch = multiplayer-fabric
-	commit = 442a86ed4e9842bd2ecc5f37a33c0fb34e3827cb
-	parent = 4d7ef7b4422a5bc07a4a5b66ccb05cbe43f7af31
+	remote = https://github.com/V-Sekai-fire/multiplayer-fabric-godot-maglev.git
+	branch = multiplayer-fabric-base
+	commit = 807a6353998f5f2d3e0f423ed3b565d3953fa481
+	parent = 853b908fd4382780196601597147a24e899f85e3
 	cmdver = 0.1.0
